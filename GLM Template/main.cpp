@@ -27,6 +27,17 @@ static void printMatrix(glm::mat3& matrix) {
 	}
 }
 
+static void printMatrix(glm::dmat3& matrix) {
+	for (uint16_t i = 0; i < 3; i++) {
+		for (uint16_t j = 0; j < 3; j++) {
+			std::cout << matrix[i][j] << " ";
+		}
+		std::cout << std::endl;
+	}
+}
+
+
+
 static void vectorOperations() {
 	glm::vec3 v1(1.0f, 2.0f, 3.0f);
 	glm::vec3 v2(4.0f, 5.0f, 6.0f);
@@ -110,49 +121,26 @@ void exercise1() {
 	glm::vec3 left = glm::cross(i, glm::cross(j, k));
 	std::cout << "Left: " << glm::to_string(left) << std::endl;
 	glm::vec3 right = j * glm::dot(i, k) - k * glm::dot(i, j);
-	std::cout << "Right: " << glm::to_string(right) << std::endl;
+	std::cout << "Right: " << glm::to_string(right) << std::endl << std::endl; //double endl to separate exercises
 	assert(glm::all(glm::epsilonEqual(left, right, THRESHOLD)));
-	/*if (glm::all(glm::epsilonEqual(left, right, THRESHOLD))) {
-		std::cout << "Cross product is associative" << std::endl;
-	}
-	else {
-		std::cout << "Cross product is not associative" << std::endl;
-	}*/
 }
 
 void exercise2(const glm::vec3 &view, const glm::vec3 &up) {
 	std::cout << "EXERCISE 2: " << std::endl;
 	glm::vec3 view_normalized = glm::normalize(view);
+	std::cout << "View normalized: " << glm::to_string(view_normalized) << std::endl;
 	glm::vec3 w = glm::normalize(glm::cross(up, view_normalized));
+	std::cout << "W: " << glm::to_string(w) << std::endl;
 	glm::vec3 u = glm::cross(view_normalized, w);
+	std::cout << "U: " << glm::to_string(u) << std::endl;
 
-	for (uint16_t i = 0; i < 3; i++) {
-		std::cout << view_normalized[i];
-		if (i != 2) {
-			std::cout << ", ";
-		}
-		else {
-			std::cout << std::endl;
-		}
-	}
-	for (uint16_t i = 0; i < 3; i++) {
-		std::cout << w[i];
-		if (i != 2) {
-			std::cout << ", ";
-		}
-		else {
-			std::cout << std::endl;
-		}
-	}
-	for (uint16_t i = 0; i < 3; i++) {
-		std::cout << u[i];
-		if (i != 2) {
-			std::cout << ", ";
-		}
-		else {
-			std::cout << std::endl;
-		}
-	}
+	glm::mat3 frame;
+	frame[0] = view_normalized;
+	frame[1] = w;
+	frame[2] = u;
+	std::cout << "Frame: " << std::endl;
+	printMatrix(frame);
+	std::cout << std::endl; //give some space between exercises
 }
 
 glm::vec3 exercise3(const glm::vec3 &vector , const glm::vec3 &axis, const double angle) {
@@ -167,19 +155,12 @@ glm::vec3 exercise3(const glm::vec3 &vector , const glm::vec3 &axis, const doubl
 	return v_rot;
 }
 void testExercise3() {
-	std::cout << "TEST EXERCISE 3: " << std::endl;
 	glm::vec3 expected = glm::vec3(0.0f, 1.41421f, 0.0f);
 	glm::vec3 axis = glm::vec3(0.0f, 0.0f, 1.0f);
 	float angle = 45.0f;
 	glm::vec3 result = exercise3(glm::vec3(1.0f, 1.0f, 0.0f), axis, angle);
 	assert(glm::all(glm::epsilonEqual(expected, result, THRESHOLD)));
-	/*if (glm::all(glm::epsilonEqual(expected, result, THRESHOLD))) {
-		std::cout << "Test passed" << std::endl;
-	}
-	else {
-		std::cout << "Test failed" << std::endl;
-	}*/
-	
+	std::cout << "Test exercise 3 passed" << std::endl;
 }
 
 glm::mat3 rodriguesRotationMatrix(const glm::vec3 &axis, float angle) {
@@ -200,36 +181,37 @@ void exercise4() {
 	glm::vec3 x_axis(1.0f, 0.0f, 0.0f);
 	glm::vec3 y_axis(0.0f, 1.0f, 0.0f);
 	glm::vec3 z_axis(0.0f, 0.0f, 1.0f);
+	std::vector<glm::vec3> vectors = { x_axis, y_axis, z_axis };
 	float angle = 90.0f;
 
-	glm::vec3 v(1.0f, 1.0f, 1.0f);
+	glm::vec3 v_x(1.0f, 0.0f, 0.0f);
+	glm::vec3 v_y(0.0f, 1.0f, 0.0f);
+	glm::vec3 v_z(0.0f, 0.0f, 1.0f);
+	std::vector<glm::vec3> axes = { v_x, v_y, v_z };
 
-	std::cout << "Rotation sequence: X -> Y -> Z\n";
-	glm::vec3 v_rot = v;
-	v_rot = rodriguesRotationMatrix(x_axis, angle) * v_rot; // Rotação em torno de X
-	std::cout << "After rotation around X-axis: " << glm::to_string(v_rot) << std::endl;
-	v_rot = rodriguesRotationMatrix(y_axis, angle) * v_rot; // Rotação em torno de Y
-	std::cout << "After rotation around Y-axis: " << glm::to_string(v_rot) << std::endl;
-	v_rot = rodriguesRotationMatrix(z_axis, angle) * v_rot; // Rotação em torno de Z
-	std::cout << "After rotation around Z-axis: " << glm::to_string(v_rot) << std::endl;
+	std::vector<glm::vec3> results = { glm::vec3(1.0f, 0.0f, 0.0f),
+		glm::vec3(0.0f, 0.0f, 1.0f),
+		glm::vec3(0.0f, -1.0f, 0.0f),
+		glm::vec3(0.0f, 0.0f, -1.0f),
+		glm::vec3(0.0f, 1.0f, 0.0f),
+		glm::vec3(1.0f, 0.0f, 0.0f),
+		glm::vec3(0.0f, 1.0f, 0.0f),
+		glm::vec3(-1.0f, 0.0f, 0.0f),
+		glm::vec3(0.0f, 0.0f, 1.0f),
+	};
 
-	std::cout << "\nRotation sequence: Y -> Z -> X\n";
-	v_rot = v;
-	v_rot = rodriguesRotationMatrix(y_axis, angle) * v_rot; // Rotação em torno de Y
-	std::cout << "After rotation around Y-axis: " << glm::to_string(v_rot) << std::endl;
-	v_rot = rodriguesRotationMatrix(z_axis, angle) * v_rot; // Rotação em torno de Z
-	std::cout << "After rotation around Z-axis: " << glm::to_string(v_rot) << std::endl;
-	v_rot = rodriguesRotationMatrix(x_axis, angle) * v_rot; // Rotação em torno de X
-	std::cout << "After rotation around X-axis: " << glm::to_string(v_rot) << std::endl;
-
-	std::cout << "\nRotation sequence: Z -> X -> Y\n";
-	v_rot = v;
-	v_rot = rodriguesRotationMatrix(z_axis, angle) * v_rot; // Rotação em torno de Z
-	std::cout << "After rotation around Z-axis: " << glm::to_string(v_rot) << std::endl;
-	v_rot = rodriguesRotationMatrix(x_axis, angle) * v_rot; // Rotação em torno de X
-	std::cout << "After rotation around X-axis: " << glm::to_string(v_rot) << std::endl;
-	v_rot = rodriguesRotationMatrix(y_axis, angle) * v_rot; // Rotação em torno de Y
-	std::cout << "After rotation around Y-axis: " << glm::to_string(v_rot) << std::endl;
+	for (uint16_t i = 0; i < 3; i++) {
+		for (uint16_t j = 0; j < 3; j++) {
+			std::cout << "Vector: " << glm::to_string(vectors[i]) << std::endl;
+			glm::vec3 result = rodriguesRotationMatrix(axes[j], angle) * vectors[i]; // Rotação em torno de X
+			std::cout << "After rotation around X-axis: " << glm::to_string(result) << std::endl;
+			std::cout << "Expected: " << glm::to_string(results[i * 3 + j]) << std::endl;
+			for (uint16_t k = 0; k < 3; k++) {
+				assert(glm::epsilonEqual(result[k], results[i * 3 + j][k], THRESHOLD));
+			}
+			std::cout << std::endl;
+		}
+	}
 
 }
 
@@ -238,15 +220,23 @@ void exercise5() {
 	//Generate random matrices A and B
 	//prove that (AB)transposed = B_transposed * A_transposed
 	glm::mat3 A = randomMat3();
+	std::cout << "Matrix A: " << std::endl;
+	printMatrix(A);
 	glm::mat3 B = randomMat3();
+	std::cout << "Matrix B: " << std::endl;
+	printMatrix(B);
 	glm::mat3 left = glm::transpose(A * B);
+	std::cout << "transpose(A*B): " << std::endl;
+	printMatrix(left);
 	glm::mat3 right = glm::transpose(B) * glm::transpose(A);
+	std::cout << "transpose(B)*transpose(A): " << std::endl;
+	printMatrix(right);
 	for (uint16_t i = 0; i < 3; i++) {
 		for (uint16_t j = 0; j < 3; j++) {
 			assert(glm::epsilonEqual(left[i][j], right[i][j], THRESHOLD));
 		}
 	}
-	std::cout << "transpose(A*B)=transpose(B)*transpose(A) " << std::endl;
+	std::cout << "transpose(A*B)=transpose(B)*transpose(A)\n " << std::endl; //double endl to separate exercises
 
 }
 
@@ -255,17 +245,25 @@ void exercise6() {
 	//prove that inverse(A*B) = inverse(B)* inverse(A)
 
 	std::cout << "EXERCISE 6: " << std::endl;
-	glm::mat3 A = randomMat3();
-	glm::mat3 B = randomMat3();
-	glm::mat3 left = glm::inverse(A * B);
-	glm::mat3 right = glm::inverse(B) * glm::inverse(A);
+	glm::dmat3 A = randomMat3();
+	std::cout << "Matrix A: " << std::endl;
+	printMatrix(A);
+	glm::dmat3 B = randomMat3();
+	std::cout << "Matrix B: " << std::endl;
+	printMatrix(B);
+	glm::dmat3 left = glm::inverse(A * B);
+	std::cout << "inverse(A*B): " << std::endl;
+	printMatrix(left);
+	glm::dmat3 right = glm::inverse(B) * glm::inverse(A);
+	std::cout << "inverse(B)*inverse(A): " << std::endl;
+	printMatrix(right);
 	for (uint16_t i = 0; i < 3; i++) {
 		for (uint16_t j = 0; j < 3; j++) {
-			assert(glm::epsilonEqual(left[i][j], right[i][j], THRESHOLD));
+			assert(fabs(left[i][j] - right[i][j] < THRESHOLD));
 		}
-		
+
 	}
-	std::cout << "inverse(A*B) = inverse(B) * inverse(A)" << std::endl;
+	std::cout << "inverse(A*B) = inverse(B) * inverse(A)\n" << std::endl; //double endl to separate exercises
 }
 
 int main() {
@@ -273,9 +271,11 @@ int main() {
 	//matrixOperations();
 	exercise1();
 	exercise2(glm::vec3(1.0f, 2.0f, 3.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	std::cout << "Exercise 3: " << std::endl;
 	for (uint16_t i = 0; i < 10; i++) {
 		testExercise3();
 	}
+	std::cout << std::endl; //give some space between exercises
 	exercise4();
 	exercise5();
 	exercise6();
