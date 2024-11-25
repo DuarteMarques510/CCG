@@ -18,6 +18,15 @@ static void printMatrix(glm::mat4& matrix) {
 	}
 }
 
+static void printMatrix(glm::mat3& matrix) {
+	for (uint16_t i = 0; i < 3; i++) {
+		for (uint16_t j = 0; j < 3; j++) {
+			std::cout << matrix[i][j] << " ";
+		}
+		std::cout << std::endl;
+	}
+}
+
 static void vectorOperations() {
 	glm::vec3 v1(1.0f, 2.0f, 3.0f);
 	glm::vec3 v2(4.0f, 5.0f, 6.0f);
@@ -91,7 +100,7 @@ static glm::mat3 randomMat3() {
 }
 
 void exercise1() {
-
+	std::cout << "EXERCISE 1: " << std::endl;
 	glm::vec3 i = randomVec();
 	std::cout << "i: " << glm::to_string(i) << std::endl;
 	glm::vec3 j = randomVec();
@@ -112,6 +121,7 @@ void exercise1() {
 }
 
 void exercise2(const glm::vec3 &view, const glm::vec3 &up) {
+	std::cout << "EXERCISE 2: " << std::endl;
 	glm::vec3 view_normalized = glm::normalize(view);
 	glm::vec3 w = glm::normalize(glm::cross(up, view_normalized));
 	glm::vec3 u = glm::cross(view_normalized, w);
@@ -157,6 +167,7 @@ glm::vec3 exercise3(const glm::vec3 &vector , const glm::vec3 &axis, const doubl
 	return v_rot;
 }
 void testExercise3() {
+	std::cout << "TEST EXERCISE 3: " << std::endl;
 	glm::vec3 expected = glm::vec3(0.0f, 1.41421f, 0.0f);
 	glm::vec3 axis = glm::vec3(0.0f, 0.0f, 1.0f);
 	float angle = 45.0f;
@@ -185,34 +196,45 @@ glm::mat3 rodriguesRotationMatrix(const glm::vec3 &axis, float angle) {
 }
 
 void exercise4() {
+	std::cout << "EXERCISE 4: " << std::endl;
 	glm::vec3 x_axis(1.0f, 0.0f, 0.0f);
 	glm::vec3 y_axis(0.0f, 1.0f, 0.0f);
 	glm::vec3 z_axis(0.0f, 0.0f, 1.0f);
 	float angle = 90.0f;
 
-	glm::mat3 R_x = rodriguesRotationMatrix(x_axis, angle);
-	glm::mat3 R_y = rodriguesRotationMatrix(y_axis, angle);
-	glm::mat3 R_z = rodriguesRotationMatrix(z_axis, angle);
-
-	std::cout << "Rotation matrix around x-axis:\n" << glm::to_string(R_x) << std::endl;
-	std::cout << "Rotation matrix around y-axis:\n" << glm::to_string(R_y) << std::endl;
-	std::cout << "Rotation matrix around z-axis:\n" << glm::to_string(R_z) << std::endl;
-
 	glm::vec3 v(1.0f, 1.0f, 1.0f);
-	glm::vec3 v_rot_x = R_x * v;
-	glm::vec3 v_rot_y = R_y * v;
-	glm::vec3 v_rot_z = R_z * v;
 
-	std::cout << "Original vector: " << glm::to_string(v) << std::endl;
-	std::cout << "Vector rotated around x-axis: " << glm::to_string(v_rot_x) << std::endl;
-	std::cout << "Vector rotated around y-axis: " << glm::to_string(v_rot_y) << std::endl;
-	std::cout << "Vector rotated around z-axis: " << glm::to_string(v_rot_z) << std::endl;
+	std::cout << "Rotation sequence: X -> Y -> Z\n";
+	glm::vec3 v_rot = v;
+	v_rot = rodriguesRotationMatrix(x_axis, angle) * v_rot; // Rotação em torno de X
+	std::cout << "After rotation around X-axis: " << glm::to_string(v_rot) << std::endl;
+	v_rot = rodriguesRotationMatrix(y_axis, angle) * v_rot; // Rotação em torno de Y
+	std::cout << "After rotation around Y-axis: " << glm::to_string(v_rot) << std::endl;
+	v_rot = rodriguesRotationMatrix(z_axis, angle) * v_rot; // Rotação em torno de Z
+	std::cout << "After rotation around Z-axis: " << glm::to_string(v_rot) << std::endl;
 
+	std::cout << "\nRotation sequence: Y -> Z -> X\n";
+	v_rot = v;
+	v_rot = rodriguesRotationMatrix(y_axis, angle) * v_rot; // Rotação em torno de Y
+	std::cout << "After rotation around Y-axis: " << glm::to_string(v_rot) << std::endl;
+	v_rot = rodriguesRotationMatrix(z_axis, angle) * v_rot; // Rotação em torno de Z
+	std::cout << "After rotation around Z-axis: " << glm::to_string(v_rot) << std::endl;
+	v_rot = rodriguesRotationMatrix(x_axis, angle) * v_rot; // Rotação em torno de X
+	std::cout << "After rotation around X-axis: " << glm::to_string(v_rot) << std::endl;
+
+	std::cout << "\nRotation sequence: Z -> X -> Y\n";
+	v_rot = v;
+	v_rot = rodriguesRotationMatrix(z_axis, angle) * v_rot; // Rotação em torno de Z
+	std::cout << "After rotation around Z-axis: " << glm::to_string(v_rot) << std::endl;
+	v_rot = rodriguesRotationMatrix(x_axis, angle) * v_rot; // Rotação em torno de X
+	std::cout << "After rotation around X-axis: " << glm::to_string(v_rot) << std::endl;
+	v_rot = rodriguesRotationMatrix(y_axis, angle) * v_rot; // Rotação em torno de Y
+	std::cout << "After rotation around Y-axis: " << glm::to_string(v_rot) << std::endl;
 
 }
 
 void exercise5() {
-
+	std::cout << "EXERCISE 5: " << std::endl;
 	//Generate random matrices A and B
 	//prove that (AB)transposed = B_transposed * A_transposed
 	glm::mat3 A = randomMat3();
@@ -231,6 +253,8 @@ void exercise5() {
 void exercise6() {
 	//Generate random matrices A and B
 	//prove that inverse(A*B) = inverse(B)* inverse(A)
+
+	std::cout << "EXERCISE 6: " << std::endl;
 	glm::mat3 A = randomMat3();
 	glm::mat3 B = randomMat3();
 	glm::mat3 left = glm::inverse(A * B);
@@ -241,7 +265,7 @@ void exercise6() {
 		}
 		
 	}
-	std::cout << "inverse(A*B) = inverse(B) * inverse_A" << std::endl;
+	std::cout << "inverse(A*B) = inverse(B) * inverse(A)" << std::endl;
 }
 
 int main() {
@@ -252,6 +276,7 @@ int main() {
 	for (uint16_t i = 0; i < 10; i++) {
 		testExercise3();
 	}
+	exercise4();
 	exercise5();
 	exercise6();
 	
